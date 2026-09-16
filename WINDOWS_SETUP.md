@@ -58,17 +58,35 @@ or double-click `Nifty Analyzer.bat`.
 
 Needs Python 3.12+ on PATH (`py` or `python`).
 
-## Build Setup.exe (optional)
+## Build Setup.exe (self-contained, no Python to install)
 
-Needs [Inno Setup 6](https://jrsoftware.org/isinfo.php) and Python 3.12.
+Inno Setup 6 is required **only on the machine that builds** the installer.
+The Setup.exe you give yourself (or others) does **not** need Python or Inno.
+
+**Double-click `Build-Setup.bat`** in this folder.
+
+Or:
 
 ```powershell
+Set-ExecutionPolicy -Scope Process Bypass
 .\build_windows.ps1
 ```
 
-Output: `dist\windows\NiftyAnalyzer-Setup-2.0.0.exe`
+Needs:
+- Python 3.12+ (build machine only)
+- [Inno Setup 6](https://jrsoftware.org/isinfo.php) with `ISCC.exe`
+  (usually `C:\Program Files (x86)\Inno Setup 6\ISCC.exe`)
 
-That exe is a per-user install (no admin). Same data folder as `install.ps1`.
+Output (this is the installer):
+
+```
+dist\windows\NiftyAnalyzer-Setup-2.0.0.exe
+```
+
+Double-click **that** file to install. It adds Start Menu + Desktop shortcuts,
+does not need admin, and does not need Python on the PC you install to.
+
+GitHub Actions also builds the same Setup.exe (`Build Windows Setup.exe` workflow).
 
 ## Docker (always-on server)
 

@@ -30,7 +30,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 Or double-click `Nifty Analyzer.bat` / run `.\run.ps1` from this folder (dev).
 
-To build `NiftyAnalyzer-Setup-2.0.0.exe`: `.\build_windows.ps1` (Python 3.12 + Inno Setup 6).
+To build a **Setup.exe** you can install like any Windows app (no Python on the target PC): double-click **`Build-Setup.bat`**. Output: `dist\windows\NiftyAnalyzer-Setup-2.0.0.exe`. Needs Inno Setup 6 + Python 3.12 on the **build** PC only.
 
 Uninstall: `powershell -File "$env:LOCALAPPDATA\NiftyAnalyzer\uninstall.ps1"`
 
@@ -80,6 +80,8 @@ Safety tests fail the build if `place_order` / `modify_order` / `cancel_order` a
 | `backend/agents/` | Specialist analysts + master (no broker tools) |
 | `frontend/` | Command Desk UI (fixed viewport, virtualized chain) |
 | `desktop.py` | pywebview/browser client |
+| `install.ps1` | Windows Start Menu install (2.0) |
+| `installer/` | Inno Setup script for Setup.exe |
 | `deploy/` | Docker Compose + Nginx |
 
 CVD is always labeled **ESTIMATED CVD** (Lee-Ready). Kite does not provide aggressor flags.

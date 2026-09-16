@@ -1,15 +1,31 @@
 <#
-  Build dist\NiftyAnalyzer\ (PyInstaller onedir) for the Command Desk.
-  Run from the repo root on Windows with Python 3.12+.
+  Build dist\NiftyAnalyzer\ (PyInstaller onedir) — self-contained, no Python required at runtime.
 #>
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
-$py = (Get-Command py -ErrorAction SilentlyContinue)
-if ($py) { $python = "py" } else { $python = "python" }
+function Get-Python {
+    foreach ($c in @("py", "python", "python3")) {
+        $hit = Get-Command $c -ErrorAction SilentlyContinue
+        if ($hit) { return $hit.Source }
+    }
+    throw "Python 3.12+ is required to BUILD the installer (the Setup.exe you ship does not need Python)."
+}
 
+$python = Get-Python
+Write-Host "Building NiftyAnalyzer.exe with $python"
+
+if (Test-Path "scripts\generate_icon.py") {
+    & $python "scripts\generate_icon.py"
+}
+
+& $python -m pip install --upgrade pip
 & $python -m pip install -r requirements.txt -r requirements-build.txt
 & $python -m PyInstaller --noconfirm --clean NiftyAnalyzer.spec
+if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
 
-Write-Host "Built dist\NiftyAnalyzer\NiftyAnalyzer.exe"
-Write-Host "Next: .\build_installer.ps1   (needs Inno Setup 6)"
+$exe = Join-Path $PSScriptRoot "dist\NiftyAnalyzer\NiftyAnalyzer.exe"
+if (-not (Test-Path $exe)) {
+    throw "Expected $exe after PyInstaller"
+}
+Write-Host "OK $exe"
