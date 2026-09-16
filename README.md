@@ -4,6 +4,8 @@ Signal-only NIFTY 50 market intelligence: an always-on server plus a visualizati
 
 **THE HUMAN ALWAYS MAKES THE FINAL TRADING DECISION. NEVER AUTOMATICALLY TRADE.**
 
+Windows users: **[WINDOWS_SETUP.md](WINDOWS_SETUP.md)** — `.\install.ps1` puts **Nifty Analyzer 2.0** on the Start Menu (upgrades the old 1.x desktop app).
+
 ```
 ZERODHA KITE (read-only)
         ↓
@@ -18,48 +20,43 @@ HUMAN DECISION
 
 There is no path `signal → broker → order`. Kite is used only for LTP, OHLC, history, instruments, quotes, OI, volume, depth, and WebSocket ticks.
 
-## Run locally
+## Install on Windows
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\install.ps1                  # Start Menu: Nifty Analyzer
+.\install.ps1 -DesktopShortcut # plus a Desktop icon
+```
+
+Or double-click `Nifty Analyzer.bat` / run `.\run.ps1` from this folder (dev).
+
+To build `NiftyAnalyzer-Setup-2.0.0.exe`: `.\build_windows.ps1` (Python 3.12 + Inno Setup 6).
+
+Uninstall: `powershell -File "$env:LOCALAPPDATA\NiftyAnalyzer\uninstall.ps1"`
+
+## Run from source
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate   # Windows: .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-export MARKET_DATA_MODE=replay   # live tape without Kite credentials (demo/tests)
-export DATABASE_URL=sqlite:///data/nifty_desk.sqlite
-python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+python desktop.py           # starts the local server and opens the desk
 ```
 
-Open http://127.0.0.1:8000
+- `MARKET_DATA_MODE=replay` (default) — deterministic session tape so the desk works without Kite.
+- `MARKET_DATA_MODE=live` — read-only Kite (`KITE_API_KEY` + daily token in `%APPDATA%\NiftyAnalyzer\.env`).
 
-- `MARKET_DATA_MODE=live` — read-only Kite (requires `KITE_API_KEY` + daily `KITE_ACCESS_TOKEN` on the **server**).
-- `MARKET_DATA_MODE=replay` — deterministic session tape for development. Production should be `live`.
-
-### Desktop (visualization only)
-
-```bash
-# Server already running (Docker or uvicorn):
-python desktop.py --client --url http://127.0.0.1:8000
-
-# Laptop-only day (embeds uvicorn on this PC):
-python desktop.py --serve
-```
-
-Closing the desktop does **not** stop a Docker/server process. Re-opening calls `GET /api/session/replay` and reconstructs the session from 09:15.
+Kite Connect **Redirect URL**: `http://127.0.0.1:8000/kite/callback`
 
 ## Docker (always-on)
 
 ```bash
 cd deploy
-cp ../.env.example .env   # put Kite keys here; never in the desktop
+cp ../assets/.env.default .env   # put Kite keys here; never in a client bundle
 docker compose up --build
 ```
 
-- API/UI: http://127.0.0.1:8000
-- Postgres `nifty_desk` is bound to **localhost only** (`127.0.0.1:5432`)
-- Redis is internal
-- Nginx on port 80 proxies HTTP + WebSocket
-
-Zerodha access tokens expire every day. At 08:40 the server checks auth; if missing, the status bar shows **KITE LOGIN REQUIRED** and **SIGNALS PAUSED**. Log in via `{ANALYZER_URL}/kite/login` so the callback stores the token on the server volume — the desktop never receives API secrets.
+Then `python desktop.py --client --url http://127.0.0.1:8000`. Closing the desktop does **not** stop collection. Re-opening calls `GET /api/session/replay`.
 
 ## Tests
 

@@ -8,6 +8,8 @@ venv/
 *.sqlite3
 data/
 dist/
+build/
+
 node_modules/
 .pytest_cache/
 .coverage

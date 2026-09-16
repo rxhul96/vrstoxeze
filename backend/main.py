@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 
 from backend.agents.desk import FORBIDDEN_TOOLS
 from backend.config import get_settings
+from backend.paths import frontend_dir
 from backend.feed.bus import MarketBus
 from backend.feed.kite import KiteLiveFeed
 from backend.feed.replay import session_tape
@@ -31,7 +32,7 @@ from backend.storage.db import get_store
 log = logging.getLogger("nifty")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
-FRONTEND = Path(__file__).resolve().parent.parent / "frontend"
+FRONTEND = frontend_dir()
 
 
 class Hub:
