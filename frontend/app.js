@@ -12,7 +12,7 @@
     series: null,
     logicalRange: null,
     overlayDirty: false,
-    lastHistoryFetch: 0,
+    seeded: false,
   };
 
   function showWin(name) {
@@ -259,10 +259,14 @@
     paintHeader(s);
     paintSignal(s.signal);
     paintRest(s);
-    if (s.candle) applyCandle(s.candle);
-    else if (s.candles && s.candles.length && state.series) {
-      state.series.setData(s.candles.map((c) => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
-      state.niftySeries.setData(s.candles.map((c) => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close })));
+    if (s.candles && s.candles.length && !state.seeded) {
+      const data = s.candles.map((c) => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close }));
+      state.series.setData(data);
+      state.niftySeries.setData(data);
+      state.seeded = true;
+      state.chart.timeScale().fitContent();
+    } else if (s.candle) {
+      applyCandle(s.candle);
     }
     renderChain();
   }

@@ -110,6 +110,13 @@ CREATE TABLE IF NOT EXISTS paper_signals (
 """
 
 
+TABLES = frozenset({
+    "sessions", "ticks", "candles", "option_snapshots", "oi_snapshots",
+    "cvd_snapshots", "pcr_snapshots", "signals", "signal_events",
+    "ict_events", "market_regime", "news", "system_health", "paper_signals",
+})
+
+
 class Store:
     def __init__(self, url: str | None = None):
         self.url = url or get_settings().database_url
@@ -183,6 +190,8 @@ class Store:
             return [dict(zip(cols, r)) for r in rows]
 
     def insert_json(self, table: str, ts: str, payload: dict, extra: dict | None = None) -> None:
+        if table not in TABLES:
+            raise ValueError(f"unknown table {table}")
         body = json.dumps(payload, default=str)
         if extra:
             cols = ["ts"] + list(extra.keys()) + ["payload"]
@@ -221,6 +230,8 @@ class Store:
         return out
 
     def upsert_session(self, session_date: str, phase: str, **kwargs: Any) -> None:
+        allowed = {"started_at", "finalized_at", "notes"}
+        kwargs = {k: v for k, v in kwargs.items() if k in allowed}
         existing = self.query(
             "SELECT session_date FROM sessions WHERE session_date = ?",
             (session_date,),
