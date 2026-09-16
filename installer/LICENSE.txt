@@ -1,0 +1,12 @@
+Nifty Analyzer 2.0 — Institutional Command Desk
+
+SIGNAL-ONLY SOFTWARE
+NO AUTOMATED TRADING
+
+This application never places, modifies, cancels, or squares off broker
+orders. Zerodha Kite is used only for read-only market data (LTP, OHLC,
+history, quotes, instruments, OI, volume, depth, WebSocket ticks).
+
+The human always makes the final trading decision.
+
+There is no path: signal → broker → order.

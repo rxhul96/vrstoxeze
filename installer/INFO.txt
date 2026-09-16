@@ -1,0 +1,15 @@
+Nifty Analyzer 2.0 installs a signal-only NIFTY 50 Command Desk.
+
+After Setup finishes you will have:
+  • Start Menu → Nifty Analyzer
+  • optional Desktop shortcut
+  • the app under %LOCALAPPDATA%\NiftyAnalyzer
+  • your config under %APPDATA%\NiftyAnalyzer
+
+No Python install is required. This Setup.exe is self-contained.
+
+Kite Connect redirect URL (read-only login):
+  http://127.0.0.1:8000/kite/callback
+
+First launch uses replay data. Edit %APPDATA%\NiftyAnalyzer\.env to
+enable live Kite market data. API secrets stay on this PC.

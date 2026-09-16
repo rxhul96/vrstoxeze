@@ -1,0 +1,2 @@
+# Desktop extras for the Windows app (native window). The server runs without these.
+pywebview>=5.4
