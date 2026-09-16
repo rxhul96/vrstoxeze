@@ -1,26 +1,45 @@
 <#
 .SYNOPSIS
-  Remove a per-user Nifty Analyzer 2.0 install created by install.ps1.
+  Remove Start Menu / Desktop shortcuts and the in-place .venv.
+  Does not delete this source folder or %APPDATA%\NiftyAnalyzer.
 #>
 [CmdletBinding()]
 param()
 
 $ErrorActionPreference = "Stop"
-$InstallRoot = Join-Path $env:LOCALAPPDATA "NiftyAnalyzer"
-$StartLink = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Nifty Analyzer.lnk"
-$DeskLink = Join-Path ([Environment]::GetFolderPath("Desktop")) "Nifty Analyzer.lnk"
+$Product = "Nifty Analyzer"
+$InstallRoot = $PSScriptRoot
+$StartLink = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\$Product.lnk"
+$Desktop = [Environment]::GetFolderPath("Desktop")
+if (-not $Desktop) { $Desktop = Join-Path $env:USERPROFILE "Desktop" }
+$DeskLink = Join-Path $Desktop "$Product.lnk"
+$DeskBat = Join-Path $Desktop "$Product.bat"
 
-foreach ($p in @($StartLink, $DeskLink)) {
+foreach ($p in @($StartLink, $DeskLink, $DeskBat)) {
     if (Test-Path $p) {
         Remove-Item $p -Force
         Write-Host "Removed $p"
     }
 }
 
-if (Test-Path $InstallRoot) {
-    Remove-Item $InstallRoot -Recurse -Force
-    Write-Host "Removed $InstallRoot"
+$venv = Join-Path $InstallRoot ".venv"
+if (Test-Path $venv) {
+    Remove-Item $venv -Recurse -Force
+    Write-Host "Removed $venv"
 }
 
-Write-Host "Kept %APPDATA%\NiftyAnalyzer (your .env and session database)."
-Write-Host "Delete that folder too if you want a completely clean slate."
+$stamp = Join-Path $InstallRoot "install.json"
+if (Test-Path $stamp) {
+    Remove-Item $stamp -Force
+}
+
+$appdataCopy = Join-Path $env:LOCALAPPDATA "NiftyAnalyzer"
+if (Test-Path (Join-Path $appdataCopy "install.json")) {
+    $meta = Get-Content (Join-Path $appdataCopy "install.json") -Raw | ConvertFrom-Json
+    if (-not $meta.inPlace) {
+        Remove-Item $appdataCopy -Recurse -Force
+        Write-Host "Removed $appdataCopy"
+    }
+}
+
+Write-Host "Kept this folder and %APPDATA%\NiftyAnalyzer (config + database)."

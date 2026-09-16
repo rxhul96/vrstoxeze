@@ -6,30 +6,38 @@ This build **cannot** place, modify, or cancel Zerodha orders.
 If you still have **1.3.x**, uninstall it first (Settings → Apps → Nifty Analyzer)
 so Start Menu shortcuts point at 2.0.
 
-## Install (recommended)
+## Install in this folder (recommended)
 
-From a checkout of this repo (PowerShell):
+The app stays in the folder you cloned (for example `D:\Trading\vrstoxeze-1`).
+It does **not** copy itself into AppData.
+
+**Double-click `INSTALL.bat`**
+
+That will:
+
+1. Create `.venv` in this folder
+2. Install Python packages here
+3. Put a **Desktop app** named **Nifty Analyzer** (custom icon)
+4. Add the same entry to the Start Menu
+5. Open the Command Desk
+
+Or from PowerShell in this folder:
 
 ```powershell
-cd D:\path\to\vrstoxeze
 Set-ExecutionPolicy -Scope Process Bypass
 .\install.ps1
 ```
 
-Optional Desktop icon:
-
-```powershell
-.\install.ps1 -DesktopShortcut
-```
-
-Then open **Nifty Analyzer** from the Start Menu.
+Add `-Launch` to open the desk as soon as install finishes.
 
 | Item | Location |
 |------|----------|
-| App files | `%LOCALAPPDATA%\NiftyAnalyzer` |
-| Config + SQLite session | `%APPDATA%\NiftyAnalyzer` |
+| App files | this folder (the repo) |
+| Virtualenv | `.\.venv` |
+| Desktop app | **Nifty Analyzer** (`.lnk` with `assets\nifty.ico`) |
 | Start Menu | Nifty Analyzer |
-| Uninstall | `powershell -File %LOCALAPPDATA%\NiftyAnalyzer\uninstall.ps1` |
+| Config + SQLite session | `%APPDATA%\NiftyAnalyzer` |
+| Uninstall shortcuts + venv | `.\uninstall.ps1` (keeps this folder and your config) |
 
 First launch uses `MARKET_DATA_MODE=replay` so the desk comes up immediately.
 Edit `%APPDATA%\NiftyAnalyzer\.env` to switch to live Kite (read-only):
@@ -48,15 +56,21 @@ http://127.0.0.1:8000/kite/callback
 
 Log in **inside the app** (server callback). The API secret never leaves this PC.
 
-## Run from the repo (no install)
+Refresh only the Desktop icon:
+
+```powershell
+.\Create-DesktopShortcut.ps1
+```
+
+## Run from the repo (already installed)
+
+Double-click the Desktop **Nifty Analyzer** icon, or `Nifty Analyzer.bat` in this folder, or:
 
 ```powershell
 .\run.ps1
 ```
 
-or double-click `Nifty Analyzer.bat`.
-
-Needs Python 3.12+ on PATH (`py` or `python`).
+Needs Python 3.12+ on PATH (`py` or `python`) the first time you install.
 
 ## Build Setup.exe (self-contained, no Python to install)
 
@@ -85,6 +99,8 @@ dist\windows\NiftyAnalyzer-Setup-2.0.0.exe
 
 Double-click **that** file to install. It adds Start Menu + Desktop shortcuts,
 does not need admin, and does not need Python on the PC you install to.
+That path copies the app into `%LOCALAPPDATA%\NiftyAnalyzer` instead of
+running from this folder.
 
 GitHub Actions also builds the same Setup.exe (`Build Windows Setup.exe` workflow).
 

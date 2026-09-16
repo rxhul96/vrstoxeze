@@ -4,7 +4,7 @@ Signal-only NIFTY 50 market intelligence: an always-on server plus a visualizati
 
 **THE HUMAN ALWAYS MAKES THE FINAL TRADING DECISION. NEVER AUTOMATICALLY TRADE.**
 
-Windows users: **[WINDOWS_SETUP.md](WINDOWS_SETUP.md)** — `.\install.ps1` puts **Nifty Analyzer 2.0** on the Start Menu (upgrades the old 1.x desktop app).
+Windows users: **[WINDOWS_SETUP.md](WINDOWS_SETUP.md)** — double-click **`INSTALL.bat`** in this folder. That installs in place and puts a **Nifty Analyzer** app on the Desktop.
 
 ```
 ZERODHA KITE (read-only)
@@ -22,17 +22,19 @@ There is no path `signal → broker → order`. Kite is used only for LTP, OHLC,
 
 ## Install on Windows
 
+Double-click **`INSTALL.bat`** in this folder. The app stays here (venv in `.\.venv`). You get a Desktop shortcut named **Nifty Analyzer** with the app icon, plus a Start Menu entry. Config stays in `%APPDATA%\NiftyAnalyzer`.
+
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
-.\install.ps1                  # Start Menu: Nifty Analyzer
-.\install.ps1 -DesktopShortcut # plus a Desktop icon
+.\install.ps1          # in-place + Desktop app shortcut
+.\install.ps1 -Launch  # same, then open the desk
 ```
 
-Or double-click `Nifty Analyzer.bat` / run `.\run.ps1` from this folder (dev).
+After that, launch from the Desktop icon (or `Nifty Analyzer.bat` / `.\run.ps1`).
 
 To build a **Setup.exe** you can install like any Windows app (no Python on the target PC): double-click **`Build-Setup.bat`**. Output: `dist\windows\NiftyAnalyzer-Setup-2.0.0.exe`. Needs Inno Setup 6 + Python 3.12 on the **build** PC only.
 
-Uninstall: `powershell -File "$env:LOCALAPPDATA\NiftyAnalyzer\uninstall.ps1"`
+Uninstall shortcuts + venv (keeps this folder): `.\uninstall.ps1`
 
 ## Run from source
 
@@ -80,7 +82,7 @@ Safety tests fail the build if `place_order` / `modify_order` / `cancel_order` a
 | `backend/agents/` | Specialist analysts + master (no broker tools) |
 | `frontend/` | Command Desk UI (fixed viewport, virtualized chain) |
 | `desktop.py` | pywebview/browser client |
-| `install.ps1` | Windows Start Menu install (2.0) |
+| `INSTALL.bat` / `install.ps1` | In-place Windows install + Desktop app shortcut |
 | `installer/` | Inno Setup script for Setup.exe |
 | `deploy/` | Docker Compose + Nginx |
 
