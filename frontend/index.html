@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NIFTY INSTITUTIONAL COMMAND DESK</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body class="term">
+  <header class="term-top">
+    <div class="brand">
+      <span class="logo">▲</span> COMMAND DESK
+      <span class="mode-pill" title="This terminal cannot place, modify, or cancel broker orders">SIGNAL-ONLY MODE</span>
+      <span class="mode-pill dim">AUTOMATED TRADING DISABLED</span>
+    </div>
+    <div class="hdr-metrics">
+      <div class="hdr-metric"><span>NIFTY</span><b id="m-ltp">—</b></div>
+      <div class="hdr-metric"><span>CHG</span><b id="m-chg">—</b></div>
+      <div class="hdr-metric"><span>%</span><b id="m-pct">—</b></div>
+      <div class="hdr-metric"><span>VWAP</span><b id="m-vwap">—</b></div>
+      <div class="hdr-metric"><span>REGIME</span><b id="m-regime">—</b></div>
+      <div class="hdr-metric"><span>BIAS</span><b id="m-bias">—</b></div>
+      <div class="hdr-metric"><span>SCORE</span><b id="m-score">—</b></div>
+      <div class="hdr-metric"><span>CONF</span><b id="m-conf">—</b></div>
+      <div class="hdr-metric"><span>STATUS</span><b id="m-live">CONNECTING</b></div>
+    </div>
+  </header>
+
+  <div class="term-body">
+    <nav class="term-nav" id="term-nav">
+      <div class="nav-label">DESK</div>
+      <button data-win="overview" class="on">Overview</button>
+      <button data-win="nifty">Nifty</button>
+      <button data-win="chain">Option Chain</button>
+      <button data-win="oi">OI Flow</button>
+      <button data-win="pcr">PCR</button>
+      <button data-win="cvd">CVD</button>
+      <button data-win="volume">Volume</button>
+      <button data-win="ict">ICT</button>
+      <button data-win="structure">Market Structure</button>
+      <button data-win="news">News</button>
+      <button data-win="signals">Signals</button>
+      <button data-win="ai">AI Desk</button>
+      <button data-win="research">Research</button>
+      <button data-win="session">Session History</button>
+      <button data-win="health">System Health</button>
+    </nav>
+
+    <main class="term-workspace">
+      <section class="term-win on" data-win="overview" id="win-overview">
+        <div class="dock">
+          <div class="dock-chart" id="overview-chart-host">
+            <div class="win-head">NIFTY 50 <span class="win-state" id="ov-state"></span>
+              <button type="button" id="btn-fit">Fit</button>
+              <button type="button" id="btn-reset">Reset</button>
+            </div>
+            <div id="chart" class="chart-el"></div>
+          </div>
+          <div class="dock-split-h" id="split-h"></div>
+          <div class="dock-bottom">
+            <div class="dock-chain">
+              <div class="win-head">OPTION CHAIN
+                <select id="chain-depth">
+                  <option value="0">ATM</option>
+                  <option value="1">ATM ±1</option>
+                  <option value="2">ATM ±2</option>
+                  <option value="3" selected>ATM ±3</option>
+                  <option value="8">ATM ±8</option>
+                  <option value="12">ATM ±12</option>
+                </select>
+                <button type="button" id="btn-atm">Center ATM</button>
+              </div>
+              <div class="chain-scroll" id="chain-scroll" tabindex="0">
+                <table class="chain-full" id="chain-table">
+                  <thead>
+                    <tr>
+                      <th class="flow-col">CE flow</th>
+                      <th>CE OI</th><th>CE ΔOI</th><th>CE Vol</th><th>CE LTP</th>
+                      <th class="strike-col">STRIKE</th>
+                      <th>PE LTP</th><th>PE Vol</th><th>PE ΔOI</th><th>PE OI</th>
+                      <th class="flow-col">PE flow</th>
+                    </tr>
+                  </thead>
+                </table>
+                <div id="chain-virt">
+                  <div id="chain-spacer-top"></div>
+                  <table class="chain-full"><tbody id="chain-body"></tbody></table>
+                  <div id="chain-spacer-bot"></div>
+                </div>
+              </div>
+            </div>
+            <div class="dock-split-v" id="split-v"></div>
+            <div class="dock-signal" id="signal-card">
+              <div class="win-head">SIGNAL</div>
+              <div id="sig-dir" class="sig-dir">NO SIGNAL</div>
+              <div id="sig-type" class="sig-type"></div>
+              <div class="sig-grid">
+                <div><span>Confidence</span><b id="sig-conf">—</b></div>
+                <div><span>Score</span><b id="sig-score">—</b></div>
+                <div><span>Entry</span><b id="sig-entry">—</b></div>
+                <div><span>T1</span><b id="sig-t1">—</b></div>
+                <div><span>T2</span><b id="sig-t2">—</b></div>
+                <div><span>Invalidation</span><b id="sig-inv">—</b></div>
+                <div><span>R:R</span><b id="sig-rr">—</b></div>
+                <div><span>State</span><b id="sig-state">WATCHING</b></div>
+              </div>
+              <div class="sig-label">Reasons</div>
+              <ul id="sig-reasons"></ul>
+              <div class="sig-label">Conflicts</div>
+              <ul id="sig-conflicts"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="term-win" data-win="nifty" id="win-nifty">
+        <div class="win-head">NIFTY PRICE</div>
+        <div id="nifty-chart" class="chart-el fill"></div>
+      </section>
+
+      <section class="term-win" data-win="chain" id="win-chain">
+        <div class="win-head">OPTION CHAIN <span class="hint">sticky header · virtualized body · page does not scroll</span></div>
+        <div class="chain-scroll fill" id="chain-scroll-full" tabindex="0"></div>
+      </section>
+
+      <section class="term-win" data-win="oi" id="win-oi">
+        <div class="win-head">OI HEATMAP <span class="hint">intensity = normalized ΔOI, not total OI</span></div>
+        <div class="oi-legend"><span class="in">addition</span><span class="out">unwinding</span></div>
+        <div id="oi-heat" class="heat-list"></div>
+      </section>
+
+      <section class="term-win" data-win="pcr" id="win-pcr">
+        <div class="win-head">PCR <span class="hint">context only — never an independent trade signal</span></div>
+        <div class="oc-summary" id="pcr-boxes"></div>
+        <p class="note" id="pcr-note"></p>
+      </section>
+
+      <section class="term-win" data-win="cvd" id="win-cvd">
+        <div class="win-head">CVD <span class="est-badge" id="cvd-badge">ESTIMATED CVD</span></div>
+        <p class="note" id="cvd-note"></p>
+        <div class="oc-summary" id="cvd-boxes"></div>
+      </section>
+
+      <section class="term-win" data-win="volume" id="win-volume">
+        <div class="win-head">VOLUME + TECHNICALS</div>
+        <div class="oc-summary" id="vol-boxes"></div>
+      </section>
+
+      <section class="term-win" data-win="ict" id="win-ict">
+        <div class="win-head">ICT / LIQUIDITY</div>
+        <pre id="ict-json" class="mono"></pre>
+      </section>
+
+      <section class="term-win" data-win="structure" id="win-structure">
+        <div class="win-head">MARKET STRUCTURE</div>
+        <div class="oc-summary" id="st-boxes"></div>
+      </section>
+
+      <section class="term-win" data-win="news" id="win-news">
+        <div class="win-head">NEWS <span class="hint">recency decay applied</span></div>
+        <div id="news-list" class="news-list"></div>
+      </section>
+
+      <section class="term-win" data-win="signals" id="win-signals">
+        <div class="win-head">SIGNAL ENGINE</div>
+        <div id="signals-full"></div>
+      </section>
+
+      <section class="term-win" data-win="ai" id="win-ai">
+        <div class="win-head">AI ANALYST DESK <span class="hint">structured evidence only — no broker tools</span></div>
+        <div id="ai-master" class="master-card"></div>
+        <div id="ai-list"></div>
+      </section>
+
+      <section class="term-win" data-win="research" id="win-research">
+        <div class="win-head">RESEARCH / PAPER TRACKING</div>
+        <p class="note">Paper tracking grades signals from subsequent candles. It never talks to the broker.</p>
+        <div id="research-list"></div>
+      </section>
+
+      <section class="term-win" data-win="session" id="win-session">
+        <div class="win-head">SESSION HISTORY</div>
+        <div id="session-meta" class="mono"></div>
+      </section>
+
+      <section class="term-win" data-win="health" id="win-health">
+        <div class="win-head">SYSTEM HEALTH</div>
+        <div class="oc-summary" id="health-boxes"></div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="term-status" id="term-status">
+    <span id="st-kite">Kite —</span>
+    <span id="st-ws">WebSocket —</span>
+    <span id="st-data">Data —</span>
+    <span id="st-opt">Options —</span>
+    <span id="st-cvd">CVD —</span>
+    <span id="st-news">News —</span>
+    <span id="st-ai">AI —</span>
+    <span id="st-srv">Server —</span>
+    <span id="st-lat">latency —</span>
+    <span id="st-upd">last —</span>
+    <span class="mode-pill">SIGNAL-ONLY MODE</span>
+    <span class="mode-pill dim">NO AUTOMATED TRADING</span>
+  </footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>

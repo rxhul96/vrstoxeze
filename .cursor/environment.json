@@ -1,0 +1,15 @@
+{
+  "name": "Nifty Institutional Command Desk",
+  "install": "python3 -m pip install -r requirements.txt",
+  "start": "mkdir -p data && MARKET_DATA_MODE=replay DATABASE_URL=sqlite:///data/nifty_desk.sqlite python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000",
+  "terminals": [
+    {
+      "name": "command-desk",
+      "command": "MARKET_DATA_MODE=replay DATABASE_URL=sqlite:///data/nifty_desk.sqlite python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000",
+      "description": "Signal-only Command Desk API + UI on port 8000. Open http://localhost:8000"
+    }
+  ],
+  "ports": [
+    { "name": "desk", "port": 8000 }
+  ]
+}
