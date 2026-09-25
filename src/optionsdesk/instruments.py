@@ -52,7 +52,9 @@ def parse_option_symbol(tradingsymbol: str) -> OptionInstrument:
     sym = (tradingsymbol or "").strip().upper()
     m = _MONTHLY.match(sym) or _WEEKLY.match(sym)
     if not m:
-        raise InstrumentRejected(f"{tradingsymbol!r} is not an NSE option tradingsymbol (expected e.g. NIFTY24SEP25000CE)")
+        raise InstrumentRejected(
+            f"{tradingsymbol!r} is not an NSE option tradingsymbol (expected e.g. NIFTY24SEP25000CE)"
+        )
     g = m.groupdict()
     expiry_code = g["yy"] + (g.get("mon") or (g["m"] + g["dd"]))
     underlying = g["underlying"]

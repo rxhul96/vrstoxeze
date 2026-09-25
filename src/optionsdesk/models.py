@@ -3,37 +3,37 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class DayStatus(str, Enum):
+class DayStatus(StrEnum):
     ACTIVE = "ACTIVE"
     STOPPED_LOSSES = "STOPPED_LOSSES"
     STOPPED_CAP = "STOPPED_CAP"
     STOPPED_MANUAL = "STOPPED_MANUAL"
 
 
-class Direction(str, Enum):
+class Direction(StrEnum):
     BUY = "BUY"
     SELL = "SELL"
 
 
-class Tier(str, Enum):
+class Tier(StrEnum):
     BASE = "BASE"
     SURE_SHOT = "SURE_SHOT"
 
 
-class EligibilityStatus(str, Enum):
+class EligibilityStatus(StrEnum):
     ELIGIBLE = "ELIGIBLE"
     NOT_TESTED = "NOT_TESTED"
     FAILED = "FAILED"
     STALE = "STALE"
 
 
-class TradeStatus(str, Enum):
+class TradeStatus(StrEnum):
     PENDING_CONFIRMATION = "PENDING_CONFIRMATION"  # live mode: waiting for operator confirmation
     OPEN = "OPEN"
     CLOSED = "CLOSED"
@@ -42,7 +42,7 @@ class TradeStatus(str, Enum):
     EXPIRED = "EXPIRED"
 
 
-class ExitReason(str, Enum):
+class ExitReason(StrEnum):
     TARGET = "TARGET"
     STOP_LOSS = "STOP_LOSS"
     MANUAL = "MANUAL"

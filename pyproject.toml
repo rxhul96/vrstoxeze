@@ -38,9 +38,10 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.ruff]
-line-length = 110
+line-length = 120
 target-version = "py311"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]  # FastAPI's Query()/Header() defaults are idiomatic

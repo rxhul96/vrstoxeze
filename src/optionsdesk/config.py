@@ -21,6 +21,8 @@ class DeskConfig(BaseSettings):
     confirm_phrase: str = Field(default=DEFAULT_CONFIRM_PHRASE, alias="DESK_CONFIRM_PHRASE")
     market_hours_only: bool = Field(default=True, alias="DESK_MARKET_HOURS_ONLY")
     allow_option_writing: bool = Field(default=False, alias="DESK_ALLOW_OPTION_WRITING")
+    # Paper fills use the last pushed LTP if it is at most this old; otherwise the signal's entry price.
+    paper_ltp_stale_sec: int = Field(default=5, ge=0, alias="DESK_PAPER_LTP_STALE_SEC")
 
     # --- sizing ---------------------------------------------------------------------------
     default_lots: int = Field(default=1, ge=1, alias="DESK_DEFAULT_LOTS")

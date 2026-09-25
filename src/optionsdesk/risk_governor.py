@@ -201,10 +201,7 @@ def is_sure_shot(quality: SignalQuality, thresholds: SureShotThresholds) -> tupl
         return False, f"live win rate {quality.live_win_rate} < {thresholds.min_win_rate:.0%}"
     if quality.oos_sharpe is None or quality.oos_sharpe < thresholds.min_oos_sharpe:
         return False, f"OOS Sharpe {quality.oos_sharpe} < {thresholds.min_oos_sharpe}"
-    if (
-        quality.confidence_percentile is None
-        or quality.confidence_percentile < thresholds.min_confidence_percentile
-    ):
+    if quality.confidence_percentile is None or quality.confidence_percentile < thresholds.min_confidence_percentile:
         return False, (
             f"confidence percentile {quality.confidence_percentile} < {thresholds.min_confidence_percentile}"
         )
@@ -239,7 +236,10 @@ def evaluate_signal(
     if state.trades_today >= limits.max_trades_per_day:
         new = replace(state, day_status=DayStatus.STOPPED_CAP)
         ev = _event(
-            state, new, "STOPPED_CAP", reason=f"{state.trades_today} trades >= cap {limits.max_trades_per_day}",
+            state,
+            new,
+            "STOPPED_CAP",
+            reason=f"{state.trades_today} trades >= cap {limits.max_trades_per_day}",
             signal_id=signal_id,
         )
         return Decision(False, "TRADE_CAP", f"daily trade cap {limits.max_trades_per_day} reached", new, (ev,))
@@ -248,8 +248,11 @@ def evaluate_signal(
     if state.losses_today >= limits.max_losses_per_day and not state.loss_stop_cleared:
         new = replace(state, day_status=DayStatus.STOPPED_LOSSES)
         ev = _event(
-            state, new, "STOPPED_LOSSES",
-            reason=f"{state.losses_today} losses >= limit {limits.max_losses_per_day}", signal_id=signal_id,
+            state,
+            new,
+            "STOPPED_LOSSES",
+            reason=f"{state.losses_today} losses >= limit {limits.max_losses_per_day}",
+            signal_id=signal_id,
         )
         return Decision(False, "LOSS_LIMIT", f"daily loss limit {limits.max_losses_per_day} reached", new, (ev,))
 
@@ -259,19 +262,29 @@ def evaluate_signal(
     # Rule 3 — base tier.
     if state.trades_today < limits.base_tier_trades:
         n = state.trades_today + 1
-        return Decision(True, "BASE_TIER", f"trade {n} of {limits.base_tier_trades} base-tier trades", state, tier=Tier.BASE)
+        return Decision(
+            True,
+            "BASE_TIER",
+            f"trade {n} of {limits.base_tier_trades} base-tier trades",
+            state,
+            tier=Tier.BASE,
+        )
 
     # Rule 4 — sure-shot tier.
     n = state.trades_today + 1
     if state.realized_pnl_today <= 0:
         return Decision(
-            False, "PNL_NOT_POSITIVE",
-            f"trade {n} needs realized PnL > 0 (currently {state.realized_pnl_today:.2f})", state,
+            False,
+            "PNL_NOT_POSITIVE",
+            f"trade {n} needs realized PnL > 0 (currently {state.realized_pnl_today:.2f})",
+            state,
         )
     if state.losses_today >= limits.max_losses_per_day:
         return Decision(
-            False, "LOSSES_AT_LIMIT",
-            f"trade {n} needs losses < {limits.max_losses_per_day} (currently {state.losses_today})", state,
+            False,
+            "LOSSES_AT_LIMIT",
+            f"trade {n} needs losses < {limits.max_losses_per_day} (currently {state.losses_today})",
+            state,
         )
     ok, why = is_sure_shot(quality, limits.sure_shot)
     if not ok:
@@ -294,8 +307,11 @@ def record_trade_opened(
         if stopped.day_status != new.day_status:
             events.append(
                 _event(
-                    new, stopped, "STOPPED_CAP",
-                    reason=f"trade cap {limits.max_trades_per_day} reached", trade_id=trade_id,
+                    new,
+                    stopped,
+                    "STOPPED_CAP",
+                    reason=f"trade cap {limits.max_trades_per_day} reached",
+                    trade_id=trade_id,
                 )
             )
         new = stopped
@@ -313,7 +329,10 @@ def record_trade_closed(
     )
     events = [
         _event(
-            state, new, "TRADE_CLOSED", trade_id=trade_id,
+            state,
+            new,
+            "TRADE_CLOSED",
+            trade_id=trade_id,
             reason=("loss" if is_loss else "win/flat") + f" {realized_pnl:+.2f}",
             details={"realized_pnl": round(realized_pnl, 2), "is_loss": is_loss},
         )
@@ -323,8 +342,11 @@ def record_trade_closed(
         if stopped.day_status != new.day_status:
             events.append(
                 _event(
-                    new, stopped, "STOPPED_LOSSES",
-                    reason=f"loss limit {limits.max_losses_per_day} reached", trade_id=trade_id,
+                    new,
+                    stopped,
+                    "STOPPED_LOSSES",
+                    reason=f"loss limit {limits.max_losses_per_day} reached",
+                    trade_id=trade_id,
                 )
             )
         new = stopped
@@ -364,7 +386,10 @@ def clear_stop(
         loss_stop_cleared=state.loss_stop_cleared or cleared_losses,
     )
     ev = _event(
-        state, new, "STOP_CLEARED", actor=actor,
+        state,
+        new,
+        "STOP_CLEARED",
+        actor=actor,
         reason=f"manual clear of {state.day_status.value}" + (f": {note}" if note else ""),
         details={"phrase_ok": True, "cleared": state.day_status.value},
     )
