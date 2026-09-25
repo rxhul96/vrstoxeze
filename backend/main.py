@@ -1,6 +1,9 @@
 """Nifty Institutional Command Desk — FastAPI intelligence server.
 
-Signal-only. No order endpoints. Desktop is a visualization client.
+The analyzer itself is signal-only: its research modules have no order endpoints and its
+Kite client is sealed read-only. The governed Trading Desk (``backend.trading_desk``,
+mounted under ``/desk``) is the single, separate path that may place orders — paper mode
+by default, ``ALLOW_LIVE_ORDERS=false``.
 """
 from __future__ import annotations
 
@@ -16,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 
 from backend.agents.desk import FORBIDDEN_TOOLS
 from backend.config import get_settings
-from backend.paths import frontend_dir
+from backend.paths import desk_ui_dir, frontend_dir
 from backend.feed.bus import MarketBus
 from backend.feed.kite import KiteLiveFeed
 from backend.feed.replay import session_tape
@@ -28,11 +31,13 @@ from backend.safety.trading_disabled import TRADING_EXECUTION_ENABLED, refuse_ex
 from backend.session.runner import SessionRunner
 from backend.signals.paper_track import grade
 from backend.storage.db import get_store
+from backend.trading_desk.runtime import DeskRuntime
 
 log = logging.getLogger("nifty")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
 FRONTEND = frontend_dir()
+DESK_UI = desk_ui_dir()
 
 
 class Hub:
@@ -43,6 +48,7 @@ class Hub:
         self.pipeline = DeskPipeline()
         self.runner = SessionRunner(self.store, kite_ok=self._kite_ok)
         self.kite = KiteLiveFeed(self.bus)
+        self.desk = DeskRuntime.build(self.settings)
         self.ws_clients: set[WebSocket] = set()
         self.last_ts = 0.0
         self.kite_ok = False
@@ -92,9 +98,18 @@ class Hub:
     async def on_bar(self, bar: dict) -> dict:
         snap = self.pipeline.ingest_bar(bar, persist=self.persist, news=self.pipeline.news)
         self.last_ts = datetime.utcnow().timestamp()
+        self.feed_desk(snap)
         await self.bus.publish(snap)
         await self.broadcast(snap)
         return snap
+
+    def feed_desk(self, snap: dict) -> list[dict]:
+        """Hand the snapshot to the Trading Desk adapter. Failures never stop the analyzer."""
+        try:
+            return self.desk.adapter.on_snapshot(snap)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("desk adapter failed: %s", exc)
+            return []
 
 
 hub = Hub()
@@ -157,6 +172,16 @@ async def health_loop() -> None:
         await asyncio.sleep(15)
 
 
+async def desk_poll_loop() -> None:
+    """Live desk only: mark open trades from Kite so SL/target exits fire between analyzer bars."""
+    while True:
+        try:
+            await asyncio.to_thread(hub.desk.poll_prices)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("desk poll: %s", exc)
+        await asyncio.sleep(3)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     assert TRADING_EXECUTION_ENABLED is False
@@ -166,14 +191,21 @@ async def lifespan(app: FastAPI):
         asyncio.create_task(news_loop()),
         asyncio.create_task(health_loop()),
     ]
-    log.info("Command Desk server up — SIGNAL-ONLY MODE")
+    if hub.desk.engine.mode == "live":
+        hub._tasks.append(asyncio.create_task(desk_poll_loop()))
+    log.info(
+        "Command Desk server up — analyzer SIGNAL-ONLY; Trading Desk /desk mode=%s", hub.desk.engine.mode
+    )
     yield
     for t in hub._tasks:
         t.cancel()
 
 
 app = FastAPI(title="Nifty Institutional Command Desk", lifespan=lifespan)
+app.mount("/static/desk", StaticFiles(directory=str(DESK_UI), check_dir=False), name="desk-ui")
 app.mount("/static", StaticFiles(directory=str(FRONTEND)), name="static")
+# Trading Desk — the only order-capable surface. Router lives in the vendored optionsdesk package.
+app.include_router(hub.desk.router)
 
 
 @app.get("/")
@@ -196,7 +228,14 @@ def api_status():
         "execution_enabled": False,
         "kite_connections": hub.bus.kite_connections,
         "mode": hub.settings.market_data_mode,
+        "desk": hub.desk.summary(),
     }
+
+
+@app.get("/api/desk")
+def api_desk():
+    """Analyzer-side view of the Trading Desk: mode, governor state, adapter wiring."""
+    return hub.desk.summary()
 
 
 @app.get("/api/snapshot")
@@ -290,10 +329,11 @@ def kite_callback(request_token: str = ""):
         data = k.generate_session(request_token, api_secret=settings.kite_api_secret)
         token = data.get("access_token")
         hub.kite.attach_token(token)
+        hub.desk.attach_kite_token(token)  # one login: the desk's broker reuses this session
         env_path = settings.data_dir / ".kite_token"
         env_path.write_text(token, encoding="utf-8")
         hub.kite_ok = True
-        return {"ok": True, "mode": "signal-only"}
+        return {"ok": True, "mode": "signal-only", "desk_mode": hub.desk.engine.mode}
     except Exception as exc:  # noqa: BLE001
         return JSONResponse({"ok": False, "reason": str(exc)}, status_code=400)
 
@@ -307,10 +347,17 @@ def api_safety():
         "agent_tools": [],
         "forbidden_tools": list(FORBIDDEN_TOOLS),
         "kite_connections": hub.bus.kite_connections,
+        # The governed desk is the only order-capable path; it is mounted separately under /desk.
+        "trading_desk": {
+            "path": "/desk",
+            "mode": hub.desk.engine.mode,
+            "allow_live_orders": hub.desk.config.allow_live_orders,
+            "armed": hub.desk.summary()["armed"],
+        },
     }
 
 
-# Deliberately no POST /api/exec/order, /api/orders, /api/exec/basket.
+# Deliberately no POST /api/exec/order, /api/orders, /api/exec/basket under the analyzer API.
 # If something still hits a guessed path, refuse without generating an order payload.
 @app.api_route("/api/exec/{rest:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
 @app.api_route("/api/orders", methods=["POST", "PUT", "PATCH", "DELETE"])
