@@ -49,7 +49,8 @@ def build_desk_router(engine: DeskEngine, *, prefix: str = "/desk", api_token: s
 
     def _desk_error(exc: Exception) -> HTTPException:
         if isinstance(exc, InstrumentRejected):
-            return HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc))
+            # Literal 422: starlette < 0.45 (pinned by the analyzer) lacks HTTP_422_UNPROCESSABLE_CONTENT.
+            return HTTPException(422, str(exc))
         if isinstance(exc, DeskError):
             return HTTPException(status.HTTP_409_CONFLICT, str(exc))
         if isinstance(exc, BrokerError):
