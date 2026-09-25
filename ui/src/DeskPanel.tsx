@@ -52,10 +52,8 @@ export function DeskPanel({ apiBase = "/desk", token, actor = "operator", pollMs
       )}
       <RiskStatus status={status.data} api={api} onChanged={refreshAll} onError={setError} />
       <TradesQueue trades={trades.data} signals={signals.data} api={api} onChanged={refreshAll} onError={setError} />
-      <div className={`grid gap-3 ${showStrategies ? "lg:grid-cols-2" : ""}`}>
-        <RiskEventsLog events={events.data} />
-        {showStrategies && <StrategiesTable strategies={strategies.data} />}
-      </div>
+      <RiskEventsLog events={events.data} />
+      {showStrategies && <StrategiesTable strategies={strategies.data} />}
     </div>
   );
 }

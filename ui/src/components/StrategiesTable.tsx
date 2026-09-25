@@ -11,7 +11,7 @@ const TONE: Record<StrategyRecord["status"], string> = {
 export function StrategiesTable({ strategies }: { strategies: StrategyRecord[] | null }) {
   return (
     <Panel title="Strategy eligibility" className="h-full">
-      <table className="w-full text-left text-[11px]">
+      <table className="w-full text-left text-[11px] [&_td]:px-1 [&_th]:px-1">
         <thead className="text-[10px] uppercase text-zinc-500">
           <tr>
             <th className="pb-1">Strategy</th>
@@ -35,7 +35,9 @@ export function StrategiesTable({ strategies }: { strategies: StrategyRecord[] |
               <td>{s.backtest ? `${(s.backtest.win_rate * 100).toFixed(0)}%` : "—"}</td>
               <td>{s.backtest?.trades ?? "—"}</td>
               <td>{s.backtest?.max_drawdown_pct ?? "—"}</td>
-              <td className="text-zinc-500">{s.code_hash.slice(0, 10)}</td>
+              <td className="text-zinc-500" title={s.code_hash}>
+                {s.code_hash.slice(0, 8)}
+              </td>
               <td className="text-zinc-400">{s.status_reason}</td>
             </tr>
           ))}

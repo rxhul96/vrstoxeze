@@ -28,7 +28,7 @@ export function RiskStatus({ status, api, onChanged, onError }: Props) {
     const id = setTimeout(() => {
       setArmStep(0);
       setKillStep(0);
-    }, 6000);
+    }, 15000);
     return () => clearTimeout(id);
   }, [armStep, killStep]);
 
@@ -41,9 +41,10 @@ export function RiskStatus({ status, api, onChanged, onError }: Props) {
     } catch (e) {
       onError(e instanceof Error ? e.message : String(e));
     } finally {
-      setBusy(false);
       setArmStep(0);
       setKillStep(0);
+      // Cooldown: a double-click must not hit the opposite control that replaces this one.
+      setTimeout(() => setBusy(false), 1500);
     }
   };
 

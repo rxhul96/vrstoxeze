@@ -18,7 +18,7 @@ export function RiskEventsLog({ events }: { events: RiskEvent[] | null }) {
   return (
     <Panel title="Risk events (append-only audit)" className="h-full">
       <div className="max-h-80 overflow-auto">
-        <table className="w-full text-left text-[11px]">
+        <table className="w-full text-left text-[11px] [&_td]:px-1 [&_th]:px-1">
           <thead className="text-[10px] uppercase text-zinc-500">
             <tr>
               <th className="pb-1">#</th>
@@ -50,7 +50,7 @@ export function RiskEventsLog({ events }: { events: RiskEvent[] | null }) {
                     <span className="text-zinc-500">{e.to_status}</span>
                   )}
                 </td>
-                <td className="text-zinc-400">
+                <td className="whitespace-nowrap text-zinc-400">
                   {e.trades_today}/{e.losses_today}
                 </td>
                 <td className={e.realized_pnl_today > 0 ? "text-emerald-300" : e.realized_pnl_today < 0 ? "text-red-300" : "text-zinc-400"}>

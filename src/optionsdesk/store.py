@@ -332,6 +332,35 @@ class DeskStore:
 
     # ---------------------------------------------------------------- trades
 
+    _TRADE_COLUMNS = frozenset(
+        {
+            "signal_id",
+            "strategy_id",
+            "tradingsymbol",
+            "underlying",
+            "direction",
+            "lots",
+            "quantity",
+            "tier",
+            "mode",
+            "status",
+            "entry_price",
+            "stop_loss",
+            "target",
+            "fill_price",
+            "exit_price",
+            "exit_reason",
+            "realized_pnl",
+            "entry_order_id",
+            "exit_order_id",
+            "created_at",
+            "opened_at",
+            "closed_at",
+            "confirm_deadline",
+            "note",
+        }
+    )
+
     def insert_trade(self, trade: dict[str, Any]) -> Trade:
         cols = [
             "signal_id",
@@ -369,6 +398,9 @@ class DeskStore:
     def update_trade(self, trade_id: int, **fields: Any) -> Trade:
         if not fields:
             return self.get_trade(trade_id)  # type: ignore[return-value]
+        unknown = set(fields) - self._TRADE_COLUMNS
+        if unknown:
+            raise ValueError(f"unknown trade columns: {sorted(unknown)}")
         sets = ", ".join(f"{k}=?" for k in fields)
         with self._lock:
             self._conn.execute(

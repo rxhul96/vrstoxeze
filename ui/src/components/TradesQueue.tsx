@@ -66,7 +66,7 @@ export function TradesQueue({ trades, signals, api, onChanged, onError }: Props)
     >
       <div className="max-h-72 overflow-auto">
         {tab === "rejected" ? (
-          <table className="w-full text-left text-[11px]">
+          <table className="w-full text-left text-[11px] [&_td]:px-1 [&_th]:px-1">
             <thead className="text-[10px] uppercase text-zinc-500">
               <tr>
                 <th className="pb-1">Time</th>
@@ -96,7 +96,7 @@ export function TradesQueue({ trades, signals, api, onChanged, onError }: Props)
             </tbody>
           </table>
         ) : (
-          <table className="w-full text-left text-[11px]">
+          <table className="w-full text-left text-[11px] [&_td]:px-1 [&_th]:px-1">
             <thead className="text-[10px] uppercase text-zinc-500">
               <tr>
                 <th className="pb-1">#</th>
