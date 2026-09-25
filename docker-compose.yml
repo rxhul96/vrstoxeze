@@ -1,0 +1,22 @@
+services:
+  desk:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Paper trading unless you set ALLOW_LIVE_ORDERS=true in .env (and KITE_* credentials).
+      ALLOW_LIVE_ORDERS: ${ALLOW_LIVE_ORDERS:-false}
+      DESK_DB_PATH: /data/desk.sqlite3
+    volumes:
+      - desk-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  desk-data:
