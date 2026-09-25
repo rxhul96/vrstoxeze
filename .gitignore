@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Desk runtime data
+data/
+*.db
+*.sqlite3
+
+# Env
+.env
+.env.local
+
+# Node / UI
+ui/node_modules/
+ui/dist/
+src/optionsdesk/static/
+npm-debug.log*
+
+# Editors
+.idea/
+.vscode/
+.DS_Store
