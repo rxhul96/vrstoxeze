@@ -6,6 +6,9 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 hidden = []
 datas = [
     ("frontend", "frontend"),
+    # Trading Desk: vendored optionsdesk sources (resolved via backend.paths.desk_src_dir) + prebuilt panel.
+    ("desk/src", "desk/src"),
+    ("desk/ui/dist-lib", "desk/ui/dist-lib"),
     ("backend/session/holidays.json", "backend/session"),
     ("assets/.env.default", "assets"),
     ("assets/nifty.ico", "assets"),
@@ -27,6 +30,7 @@ for pkg in (
     "click",
     "webview",
     "backend",
+    "optionsdesk",
 ):
     try:
         d, b, h = collect_all(pkg)
@@ -51,11 +55,16 @@ hidden += [
     "webview.platforms.edgechromium",
     "backend.main",
     "backend.paths",
+    "backend.trading_desk.runtime",
+    "optionsdesk.api",
+    "optionsdesk.engine",
+    "optionsdesk.brokers.paper",
+    "optionsdesk.brokers.kite",
 ]
 
 a = Analysis(
     ["desktop.py"],
-    pathex=["."],
+    pathex=[".", "desk/src"],
     binaries=binaries,
     datas=datas,
     hiddenimports=sorted(set(hidden)),

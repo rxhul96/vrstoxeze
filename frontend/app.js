@@ -24,7 +24,7 @@
   }
   document.getElementById("term-nav").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-win]");
-    if (b) showWin(b.dataset.win);
+    if (b) { showWin(b.dataset.win); history.replaceState(null, "", "#" + b.dataset.win); }
   });
 
   function clsNum(n) {
@@ -333,6 +333,9 @@
 
   initChart();
   sizeChart();
+  // Deep link: /#desk opens the Trading Desk window directly.
+  const wanted = location.hash.slice(1);
+  if (wanted && document.querySelector(`.term-win[data-win="${wanted}"]`)) showWin(wanted);
   connect();
   fetch("/api/snapshot").then((r) => r.json()).then((s) => { if (s && s.spot) ingest(s); }).catch(() => {});
   fetch("/api/session/replay").then((r) => r.json()).then((rep) => {
