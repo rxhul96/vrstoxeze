@@ -12,7 +12,6 @@ from optionsdesk.engine import DeskEngine, DeskError
 from optionsdesk.instruments import InstrumentRejected
 from optionsdesk.models import SignalIn, StrategyRegistration, TradeStatus
 
-
 # starlette renamed HTTP_422_UNPROCESSABLE_ENTITY -> _CONTENT across 0.41/0.4x; a literal is version-safe.
 HTTP_422 = 422
 
