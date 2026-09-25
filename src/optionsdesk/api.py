@@ -13,6 +13,10 @@ from optionsdesk.instruments import InstrumentRejected
 from optionsdesk.models import SignalIn, StrategyRegistration, TradeStatus
 
 
+# starlette renamed HTTP_422_UNPROCESSABLE_ENTITY -> _CONTENT across 0.41/0.4x; a literal is version-safe.
+HTTP_422 = 422
+
+
 class ActorBody(BaseModel):
     actor: str = Field(default="operator", max_length=64)
 
@@ -49,7 +53,7 @@ def build_desk_router(engine: DeskEngine, *, prefix: str = "/desk", api_token: s
 
     def _desk_error(exc: Exception) -> HTTPException:
         if isinstance(exc, InstrumentRejected):
-            return HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc))
+            return HTTPException(HTTP_422, str(exc))
         if isinstance(exc, DeskError):
             return HTTPException(status.HTTP_409_CONFLICT, str(exc))
         if isinstance(exc, BrokerError):
