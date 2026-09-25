@@ -43,6 +43,22 @@ def frontend_dir() -> Path:
     return install_root() / "frontend"
 
 
+def desk_src_dir() -> Path:
+    """Vendored ``optionsdesk`` package root (``desk/src``), importable without pip."""
+    bundled = bundle_root() / "desk" / "src"
+    if (bundled / "optionsdesk" / "__init__.py").exists():
+        return bundled
+    return install_root() / "desk" / "src"
+
+
+def desk_ui_dir() -> Path:
+    """Prebuilt desk panel (``desk/ui/dist-lib``) served under /static/desk."""
+    bundled = bundle_root() / "desk" / "ui" / "dist-lib"
+    if (bundled / "optionsdesk-ui.js").exists():
+        return bundled
+    return install_root() / "desk" / "ui" / "dist-lib"
+
+
 def env_files() -> tuple[str, ...]:
     """User .env wins over install .env, which wins over bundled defaults."""
     candidates = [

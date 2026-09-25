@@ -6,13 +6,25 @@
   <title>NIFTY INSTITUTIONAL COMMAND DESK</title>
   <link rel="stylesheet" href="/static/style.css" />
   <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <!-- Trading Desk panel: the desk's own React/Tailwind bundle (desk/ui/dist-lib), React resolved via import map. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@19.1.0",
+        "react/jsx-runtime": "https://esm.sh/react@19.1.0/jsx-runtime",
+        "react-dom": "https://esm.sh/react-dom@19.1.0?deps=react@19.1.0",
+        "react-dom/client": "https://esm.sh/react-dom@19.1.0/client?deps=react@19.1.0",
+        "optionsdesk-ui": "/static/desk/optionsdesk-ui.js"
+      }
+    }
+  </script>
 </head>
 <body class="term">
   <header class="term-top">
     <div class="brand">
       <span class="logo">▲</span> COMMAND DESK
-      <span class="mode-pill" title="This terminal cannot place, modify, or cancel broker orders">SIGNAL-ONLY MODE</span>
-      <span class="mode-pill dim">AUTOMATED TRADING DISABLED</span>
+      <span class="mode-pill" title="Analyzer modules cannot place, modify, or cancel broker orders">SIGNAL-ONLY MODE</span>
+      <span class="mode-pill dim" title="Research modules never trade. Orders exist only inside the governed Trading Desk (paper by default)">AUTOMATED TRADING DISABLED</span>
     </div>
     <div class="hdr-metrics">
       <div class="hdr-metric"><span>NIFTY</span><b id="m-ltp">—</b></div>
@@ -41,6 +53,7 @@
       <button data-win="structure">Market Structure</button>
       <button data-win="news">News</button>
       <button data-win="signals">Signals</button>
+      <button data-win="desk" class="nav-desk">Trading Desk <span class="nav-tag" id="nav-desk-mode">—</span></button>
       <button data-win="ai">AI Desk</button>
       <button data-win="research">Research</button>
       <button data-win="session">Session History</button>
@@ -167,6 +180,16 @@
         <div id="signals-full"></div>
       </section>
 
+      <section class="term-win" data-win="desk" id="win-desk">
+        <div class="win-head">TRADING DESK
+          <span class="hint">governed NSE options desk · the only order-capable path · paper unless ALLOW_LIVE_ORDERS=true</span>
+          <span class="desk-mode-pill" id="desk-mode-pill">—</span>
+        </div>
+        <div class="desk-host" id="desk-panel-host">
+          <div class="desk-loading" id="desk-loading">loading desk panel…</div>
+        </div>
+      </section>
+
       <section class="term-win" data-win="ai" id="win-ai">
         <div class="win-head">AI ANALYST DESK <span class="hint">structured evidence only — no broker tools</span></div>
         <div id="ai-master" class="master-card"></div>
@@ -202,9 +225,11 @@
     <span id="st-srv">Server —</span>
     <span id="st-lat">latency —</span>
     <span id="st-upd">last —</span>
-    <span class="mode-pill">SIGNAL-ONLY MODE</span>
-    <span class="mode-pill dim">NO AUTOMATED TRADING</span>
+    <span id="st-desk">Desk —</span>
+    <span class="mode-pill" title="Analyzer modules cannot place orders; only the governed Trading Desk can">SIGNAL-ONLY MODE</span>
+    <span class="mode-pill dim" title="Research modules never trade. The Trading Desk is paper unless ALLOW_LIVE_ORDERS=true">AUTOMATED TRADING DISABLED · ANALYZER</span>
   </footer>
   <script src="/static/app.js"></script>
+  <script type="module" src="/static/desk.js"></script>
 </body>
 </html>

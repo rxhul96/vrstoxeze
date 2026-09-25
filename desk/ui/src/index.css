@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-term-bg: #0b0e14;
+  --color-term-panel: #11161f;
+  --color-term-border: #1f2937;
+  --color-term-green: #22c55e;
+  --color-term-red: #ef4444;
+  --color-term-amber: #f59e0b;
+  --color-term-cyan: #22d3ee;
+}
+
+.desk-root {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.desk-root ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.desk-root ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}

@@ -127,3 +127,22 @@ button:hover { border-color: var(--blue); }
 .news-item .src { color: var(--muted); font-size: 10px; }
 .master-card { background: var(--panel); border: 1px solid var(--border); padding: 10px; margin-bottom: 10px; }
 .ai-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding: 6px 0; }
+
+/* Trading Desk window */
+.term-nav button.nav-desk { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.nav-tag { font-size: 9px; letter-spacing: .08em; color: var(--teal); border: 1px solid var(--border); padding: 0 4px; }
+.desk-host { flex: 1; min-height: 0; overflow: auto; }
+.desk-loading { color: var(--muted); padding: 12px 0; }
+.desk-mode-pill {
+  margin-left: auto; font-size: 9px; letter-spacing: .08em; font-weight: 700; padding: 2px 6px;
+  border: 1px solid var(--muted); color: var(--muted); text-transform: none;
+}
+.desk-mode-pill.paper { border-color: var(--teal); color: var(--teal); }
+.desk-mode-pill.live { border-color: var(--red); color: var(--red); }
+.desk-mode-pill.off { border-color: var(--muted); color: var(--muted); }
+.desk-fallback { display: flex; flex-direction: column; gap: 8px; }
+.desk-fb-note { color: var(--amber); font-size: 11px; }
+.desk-fb-actions { display: flex; gap: 8px; align-items: center; }
+.desk-fb-actions button.kill { border-color: var(--red); color: var(--red); font-weight: 700; padding: 6px 12px; }
+.desk-fb-actions button.kill:hover { background: var(--red); color: #fff; }
+.desk-fb-msg { color: var(--muted); font-size: 11px; }

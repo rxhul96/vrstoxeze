@@ -1,0 +1,1 @@
+{"root":["./src/DeskPanel.tsx","./src/api.ts","./src/hooks.ts","./src/lib.ts","./src/main.tsx","./src/types.ts","./src/components/RiskEventsLog.tsx","./src/components/RiskStatus.tsx","./src/components/StrategiesTable.tsx","./src/components/TradesQueue.tsx","./src/components/ui.tsx"],"version":"5.9.3"}
